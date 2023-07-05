@@ -1,7 +1,7 @@
 import basket from "./basket";
 
 export default {
-  nammespacing: true,
+  namespaced: true,
   state: {},
   getters: {},
   mutations: {},
@@ -15,8 +15,7 @@ export default {
      * } productObject price object
      */
     addProductInCatalog: (state, productObject) => {
-      state.dispatch("catalog/basket/addProduct", productObject);
-      state.dispatch("catalog/products/addProductElement", productObject);
+      state.dispatch("basket/addProductElement", productObject);
     },
   },
   modules: {
