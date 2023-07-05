@@ -1,26 +1,25 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to Your Vue.js App" />
+  <div class="container mt-5">
+    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Labore dignissimos
+    quisquam sint quod aliquid, cupiditate velit at facere eveniet iure sequi
+    exercitationem enum, aperiam veniam reprehenderit ipsum, ad mollitia
+    excepturi?
+    <el-button type="primary">Push</el-button>
+  </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import { ElButton } from "element-plus";
 
 export default {
-  name: "App",
   components: {
-    HelloWorld,
+    ElButton,
   },
+
+  data: () => ({
+    test: 1234,
+  }),
 };
 </script>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+<style lang="scss"></style>
