@@ -9,20 +9,20 @@
 import { mapGetters } from "vuex";
 
 export default {
-  name: "app-header",
+  name: "AppHeader",
   computed: {
     ...mapGetters({
-      productsFromBasket: "catalog/basket/getProducts",
+      productsInBasket: "catalog/getProductsInBasket",
     }),
 
     totalPrice() {
-      return this.productsFromBasket.reduce(
+      return this.productsInBasket.reduce(
         (acc, elem) => (acc += elem.price),
         0
       );
     },
     productCount() {
-      return this.productsFromBasket.length;
+      return this.productsInBasket.length;
     },
   },
 };
