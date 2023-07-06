@@ -12,6 +12,10 @@ export default {
     getAvailableProductsList: (state, getters) => {
       return getters["products/getProducts"];
     },
+
+    getProductsQuantityByIdInBasket: (state, getters) => {
+      return getters["basket/getProductsQuantityByIdInBasket"];
+    },
   },
   mutations: {},
   actions: {

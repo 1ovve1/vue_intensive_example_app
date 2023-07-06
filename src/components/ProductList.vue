@@ -54,6 +54,7 @@ export default {
   computed: {
     ...mapGetters({
       availableProductsList: "catalog/getAvailableProductsList",
+      productsQuantityByIdInBasket: "catalog/getProductsQuantityByIdInBasket",
     }),
   },
   methods: {
@@ -65,7 +66,7 @@ export default {
     incProductCount(product) {
       let count = this.parseCountValue(product);
 
-      if (count < product.countAvaliable) {
+      if (count < this.calculateLeftovers(product)) {
         ++count;
       }
 
@@ -82,8 +83,37 @@ export default {
       this.setProductCountAndRender(product, count);
     },
 
+    addToBasket(product) {
+      const countAvailableAfterAddToBasket = this.calculateLeftovers(product);
+      let count = this.parseCountValue(product);
+
+      if (count > countAvailableAfterAddToBasket) {
+        count = countAvailableAfterAddToBasket;
+      }
+
+      this.setProductCountAndRender(product, count);
+
+      for (let i = 0; i < count; i++) {
+        this.addProductInBasket(product);
+      }
+    },
+
+    calculateLeftovers(product) {
+      const productId = product.id;
+      const countAvailable = product.countAvailable;
+
+      if (this.productsQuantityByIdInBasket.has(productId)) {
+        const countAvailableWithBasket =
+          countAvailable - this.productsQuantityByIdInBasket.get(productId);
+
+        return countAvailableWithBasket;
+      } else {
+        return countAvailable;
+      }
+    },
+
     parseCountValue(product) {
-      let count = parseInt(product.count);
+      const count = parseInt(product.count);
 
       return isNaN(count) ? product.count : count;
     },
@@ -91,14 +121,6 @@ export default {
     setProductCountAndRender(product, newCountValue) {
       product.count = newCountValue;
       product.render = !product.render;
-    },
-
-    addToBasket(product) {
-      const count = parseInt(product.count);
-
-      for (let i = 0; i < count; i++) {
-        this.addProductInBasket(product);
-      }
     },
   },
   created() {
