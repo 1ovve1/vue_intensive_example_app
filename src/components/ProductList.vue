@@ -1,33 +1,42 @@
 <template>
-  <div class="container mt-5" v-for="product in products" :key="product.id">
-    <div class="card">
-      <div class="card-body">
-        <h4 class="card-title">{{ product.name }}</h4>
-        <p class="card-text">{{ product.price }}</p>
-        <div class="container row">
-          <el-button
-            class="col-1"
-            type="primary"
-            @click="incProductCount(product)"
-          >
-            +
-          </el-button>
-          <el-button
-            class="col-1"
-            type="primary"
-            @click="decProductCount(product)"
-          >
-            -
-          </el-button>
-          <input
-            :value="product.count"
-            :key="product.render"
-            class="col-2 ms-2"
-            type="text"
-          />
+  <div class="row">
+    <div class="col-3 mt-5" v-for="product in products" :key="product.id">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title text-center">{{ product.name }}</h4>
+
+          <img class="card-img-top" :src="product.img" alt="Title" />
+
+          <p class="card-text text-end">Price: {{ product.price }}$</p>
+
+          <div class="container d-flex justify-content-center">
+            <el-button
+              class="col-2"
+              type="primary"
+              @click="incProductCount(product)"
+            >
+              +
+            </el-button>
+            <el-button
+              class="col-2"
+              type="primary"
+              @click="decProductCount(product)"
+            >
+              -
+            </el-button>
+            <input
+              :value="product.count"
+              :key="product.render"
+              class="col-2 ms-2"
+              type="text"
+            />
+          </div>
+          <i class="d-block text-center">
+            Available: {{ calculateLeftovers(product) }}
+          </i>
 
           <el-button
-            class="col-3 ms-2"
+            class="d-block mx-auto mt-2"
             type="success"
             @click="addToBasket(product)"
           >
@@ -84,6 +93,16 @@ export default {
     },
 
     addToBasket(product) {
+      const count = this.updateAvailable(product);
+
+      for (let i = 0; i < count; i++) {
+        this.addProductInBasket(product);
+      }
+
+      this.updateAvailable(product);
+    },
+
+    updateAvailable(product) {
       const countAvailableAfterAddToBasket = this.calculateLeftovers(product);
       let count = this.parseCountValue(product);
 
@@ -93,9 +112,7 @@ export default {
 
       this.setProductCountAndRender(product, count);
 
-      for (let i = 0; i < count; i++) {
-        this.addProductInBasket(product);
-      }
+      return count;
     },
 
     calculateLeftovers(product) {
