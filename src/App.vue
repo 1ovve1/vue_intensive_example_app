@@ -1,11 +1,19 @@
 <template>
-  <AppHeader />
+  <div class="main">
+    <div class="main__content">
+      <header class="main__header header">
+        <AppHeader />
+      </header>
 
-  <div class="container">
-    <AppProductList />
+      <div class="content container">
+        <AppProductList />
+      </div>
+    </div>
+
+    <div class="main__footer footer">
+      <AppFooter />
+    </div>
   </div>
-
-  <AppFooter />
 </template>
 
 <script>
