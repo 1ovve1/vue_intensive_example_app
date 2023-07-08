@@ -1,6 +1,10 @@
 <template>
   <div class="row">
-    <div class="col-3 mt-5" v-for="product in products" :key="product.id">
+    <div
+      class="col-xl-3 col-md-4 col-sm-6 mt-5"
+      v-for="product in products"
+      :key="product.id"
+    >
       <div class="card">
         <div class="card-body">
           <h4 class="card-title text-center">{{ product.name }}</h4>
