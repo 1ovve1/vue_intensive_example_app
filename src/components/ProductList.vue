@@ -11,7 +11,9 @@
 
           <img class="card-img-top" :src="product.img" alt="Title" />
 
-          <p class="card-text text-end">Price: {{ product.price }}$</p>
+          <p class="card-text text-end">
+            Price: <AppPrice :value="product.price" :bold="false" />
+          </p>
 
           <div class="container d-flex justify-content-center">
             <el-button
@@ -55,11 +57,13 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { ElButton } from "element-plus";
+import AppPrice from "./Price.vue";
 
 export default {
   name: "AppProductList",
   components: {
     ElButton,
+    AppPrice,
   },
   data: () => ({
     products: [],
