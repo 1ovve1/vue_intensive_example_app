@@ -1,49 +1,53 @@
 export default {
   namespaced: true,
   state: {
-    basket: [],
+    basket: new Map(),
   },
   getters: {
-    getProducts: (state) => state.basket,
+    getProductsInBasketMap: (state) => state.basket,
 
-    getProductByIndex: (state, index) =>
-      state.basket.find((elem) => elem.id === index),
+    getProductById: (state, productId) => state.basket.get(productId),
 
     getProductsQuantityByIdInBasket: (state) => {
       const dict = new Map();
 
-      for (const product of state.basket) {
-        const id = product.id;
-        let quantity = 0;
+      for (const key of state.basket.keys()) {
+        const productObject = state.basket.get(key);
 
-        if (dict.has(id)) {
-          quantity = dict.get(id);
-        }
-
-        dict.set(id, quantity + 1);
+        dict.set(productObject.id, productObject.quantityInBasket);
       }
 
       return dict;
     },
   },
   mutations: {
-    addProduct: (state, productObject) => state.basket.push(productObject),
+    setProduct: (state, { productId, productObject }) =>
+      state.basket.set(productId, productObject),
 
-    removeProduct: (state, productLocalIndex) =>
-      state.basket.splice(productLocalIndex, 1),
+    deleteProduct: (state, productId) => state.basket.delete(productId),
   },
   actions: {
-    addProductElement: (state, productObject) => {
-      state.commit("addProduct", productObject);
+    addProductElement: ({ state, commit }, { productId, productObject }) => {
+      if (state.basket.has(productId)) {
+        productObject = state.basket.get(productId);
+        productObject.quantityInBasket++;
+      } else {
+        productObject.quantityInBasket = 1;
+      }
+
+      commit("setProduct", { productId, productObject });
     },
 
-    removeProductElement: ({ commit, state }, productId) => {
-      const element = state.basket.find((product) => product.id === productId);
+    removeProductElement: ({ state, commit }, productId) => {
+      if (state.basket.has(productId)) {
+        const productObject = state.basket.get(productId);
 
-      if (element) {
-        const localIndex = state.basket.indexOf(element);
-
-        commit("removeProduct", localIndex);
+        if (productObject.quantityInBasket <= 1) {
+          commit("deleteProduct", productId);
+        } else {
+          productObject.quantityInBasket--;
+          commit("setProduct", productId, productObject);
+        }
       }
     },
   },

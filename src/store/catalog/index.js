@@ -5,8 +5,8 @@ export default {
   namespaced: true,
   state: {},
   getters: {
-    getProductsInBasket: (state, getters) => {
-      return getters["basket/getProducts"];
+    getProductsInBasketMap: (state, getters) => {
+      return getters["basket/getProductsInBasketMap"];
     },
 
     getAvailableProductsList: (state, getters) => {
@@ -19,19 +19,8 @@ export default {
   },
   mutations: {},
   actions: {
-    /**
-     * @param {Object} state
-     * @param {
-     *    productObject: {
-     *      id: Number,
-     *      price: Number,
-     *    },
-     *    count: Number,
-     * } productObject price object
-     * @param count
-     */
-    addProductInBasket: (state, productObject) => {
-      state.dispatch("basket/addProductElement", productObject);
+    addProductInBasket: (state, { productId, productObject }) => {
+      state.dispatch("basket/addProductElement", { productId, productObject });
     },
 
     removeProductFromBasket: (state, productId) => {

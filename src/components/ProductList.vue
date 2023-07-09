@@ -104,7 +104,10 @@ export default {
       const count = this.updateAvailable(product);
 
       for (let i = 0; i < count; i++) {
-        this.addProductInBasket(product);
+        this.addProductInBasket({
+          productId: product.id,
+          productObject: product,
+        });
       }
 
       this.updateAvailable(product);
