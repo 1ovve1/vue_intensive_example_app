@@ -45,16 +45,16 @@
                 <font-awesome-icon icon="fa-heart"> </font-awesome-icon>
                 <span class="mx-1">{{}}</span>
               </a>
-              <snap class="m-2 m-lg-0"></snap>
+              <span class="m-2 m-lg-0"></span>
               <a class="nav-link d-flex" href="#">
                 <font-awesome-icon icon="fa-shopping-bag"> </font-awesome-icon>
-                <span class="mx-1">{{ basketCount }}</span>
+                <span class="mx-1">{{ basketProductsQuantity }}</span>
               </a>
             </li>
             <li class="nav-item pe-3"></li>
             <li class="nav-item">
               <span class="">items: </span>
-              <AppPrice :value="basketTotalPrice" />
+              <AppPrice :value="basketTotalProductsPrice" />
             </li>
           </ul>
         </div>
@@ -77,22 +77,22 @@ export default {
       productsInBasketMap: "catalog/getProductsInBasketMap",
     }),
 
-    basketTotalPrice() {
+    basketTotalProductsPrice() {
       let totalPriceInBasket = 0;
 
       this.productsInBasketMap.forEach(
         (product) =>
-          (totalPriceInBasket += product.price * product.quantityInBasket)
+          (totalPriceInBasket += product.price * product.basketQuantity)
       );
 
       return totalPriceInBasket;
     },
 
-    basketCount() {
+    basketProductsQuantity() {
       let totalQuantityInBasket = 0;
 
       this.productsInBasketMap.forEach(
-        (product) => (totalQuantityInBasket += product.quantityInBasket)
+        (product) => (totalQuantityInBasket += product.basketQuantity)
       );
 
       return totalQuantityInBasket;

@@ -5,26 +5,56 @@ export default {
   namespaced: true,
   state: {},
   getters: {
-    getProductsInBasketMap: (state, getters) => {
-      return getters["basket/getProductsInBasketMap"];
+    getProductsInBasketMap: (_, getters) => {
+      const productsInBasket = new Map();
+      const basketItemsMap = getters["basket/getBasketItemsMap"];
+
+      for (const [productId, basketItem] of basketItemsMap) {
+        const productInCatalog = getters["products/getProductById"](productId);
+
+        // merge basket item and product items fields
+        Object.assign(productInCatalog, basketItem);
+
+        productsInBasket.set(productId, productInCatalog);
+      }
+
+      return productsInBasket;
     },
 
-    getAvailableProductsList: (state, getters) => {
-      return getters["products/getProducts"];
+    getProductsMap: (_, getters) => {
+      const productsMap = new Map();
+      const products = getters["products/getProducts"];
+
+      for (const product of products) {
+        const productId = product.id;
+
+        productsMap.set(productId, product);
+      }
+
+      return productsMap;
     },
 
-    getProductsQuantityByIdInBasket: (state, getters) => {
-      return getters["basket/getProductsQuantityByIdInBasket"];
+    getBasketItemsMap: (_, getters) => {
+      return getters["basket/getBasketItemsMap"];
     },
   },
   mutations: {},
   actions: {
-    addProductInBasket: (state, { productId, productObject }) => {
-      state.dispatch("basket/addProductElement", { productId, productObject });
+    addProductInBasket: ({ dispatch, getters }, productId) => {
+      const productInCatalog = getters["products/getProductById"](productId);
+      const basketItem = getters["basket/getBasketItemById"](productId);
+
+      if (productInCatalog.available - basketItem.basketQuantity <= 0) {
+        throw new Error(
+          `Not found available product (productId: ${productId}) in catalog`
+        );
+      }
+
+      dispatch("basket/addProductInBasket", productId);
     },
 
-    removeProductFromBasket: (state, productId) => {
-      state.dispatch("basket/removeProductElement", productId);
+    removeProductFromBasket: ({ dispatch }, productId) => {
+      dispatch("basket/removeProductElement", productId);
     },
   },
   modules: {

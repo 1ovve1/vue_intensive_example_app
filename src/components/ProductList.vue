@@ -2,162 +2,50 @@
   <div class="row">
     <div
       class="col-xl-3 col-md-4 col-sm-6 mt-5"
-      v-for="product in products"
-      :key="product.id"
+      v-for="[productId, product] of productsMap"
+      :key="productId"
     >
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title text-center">{{ product.name }}</h4>
-
-          <img class="card-img-top" :src="product.img" alt="Title" />
-
-          <p class="card-text text-end">
-            Price: <AppPrice :value="product.price" :bold="false" />
-          </p>
-
-          <div class="container d-flex justify-content-center">
-            <el-button
-              class="col-2"
-              type="primary"
-              @click="incProductCount(product)"
-            >
-              +
-            </el-button>
-            <el-button
-              class="col-2"
-              type="primary"
-              @click="decProductCount(product)"
-            >
-              -
-            </el-button>
-            <input
-              :value="product.count"
-              :key="product.render"
-              class="col-2 ms-2"
-              type="text"
-            />
-          </div>
-          <i class="d-block text-center">
-            Available: {{ calculateLeftovers(product) }}
-          </i>
-
-          <el-button
-            class="d-block mx-auto mt-2"
-            type="success"
-            @click="addToBasket(product)"
-          >
-            Add To Basket
-          </el-button>
-        </div>
-      </div>
+      <AppProductCard
+        :id="productId"
+        :name="product.name"
+        :img="product.img"
+        :price="product.price"
+        :available="product.available"
+        @addproduct="addToBasket(productId, $event)"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import { ElButton } from "element-plus";
-import AppPrice from "./Price.vue";
+import AppProductCard from "./ProductCard.vue";
 
 export default {
   name: "AppProductList",
+  data: () => ({}),
   components: {
-    ElButton,
-    AppPrice,
+    AppProductCard,
   },
-  data: () => ({
-    products: [],
-  }),
   computed: {
     ...mapGetters({
-      availableProductsList: "catalog/getAvailableProductsList",
-      productsQuantityByIdInBasket: "catalog/getProductsQuantityByIdInBasket",
+      productsMap: "catalog/getProductsMap",
     }),
   },
   methods: {
     ...mapActions({
       addProductInBasket: "catalog/addProductInBasket",
-      removeProductFromBasket: "catalog/removeProductFromBasket",
     }),
 
-    incProductCount(product) {
-      let count = this.parseCountValue(product);
-
-      if (count < this.calculateLeftovers(product)) {
-        ++count;
-      }
-
-      this.setProductCountAndRender(product, count);
-    },
-
-    decProductCount(product) {
-      let count = this.parseCountValue(product);
-
-      if (count > 0) {
-        --count;
-      }
-
-      this.setProductCountAndRender(product, count);
-    },
-
-    addToBasket(product) {
-      const count = this.updateAvailable(product);
-
-      for (let i = 0; i < count; i++) {
-        this.addProductInBasket({
-          productId: product.id,
-          productObject: product,
-        });
-      }
-
-      this.updateAvailable(product);
-    },
-
-    updateAvailable(product) {
-      const countAvailableAfterAddToBasket = this.calculateLeftovers(product);
-      let count = this.parseCountValue(product);
-
-      if (count > countAvailableAfterAddToBasket) {
-        count = countAvailableAfterAddToBasket;
-      }
-
-      this.setProductCountAndRender(product, count);
-
-      return count;
-    },
-
-    calculateLeftovers(product) {
-      const productId = product.id;
-      const countAvailable = product.countAvailable;
-
-      if (this.productsQuantityByIdInBasket.has(productId)) {
-        const countAvailableWithBasket =
-          countAvailable - this.productsQuantityByIdInBasket.get(productId);
-
-        return countAvailableWithBasket;
-      } else {
-        return countAvailable;
+    addToBasket(productId, { target: { quantity } }) {
+      try {
+        for (let i = 0; i < quantity; i++) {
+          this.addProductInBasket(productId);
+        }
+      } catch (err) {
+        alert(`Product (productId: ${productId}) out of stock`);
       }
     },
-
-    parseCountValue(product) {
-      const count = parseInt(product.count);
-
-      return isNaN(count) ? product.count : count;
-    },
-
-    setProductCountAndRender(product, newCountValue) {
-      product.count = newCountValue;
-      product.render = !product.render;
-    },
-  },
-  created() {
-    this.products = this.availableProductsList;
-
-    for (const product of this.products) {
-      product.count = 1;
-      product.render = false;
-    }
   },
 };
 </script>

@@ -2,52 +2,58 @@ export default {
   namespaced: true,
   state: {
     basket: new Map(),
+    default: {
+      basketQuantity: 0,
+    },
   },
   getters: {
-    getProductsInBasketMap: (state) => state.basket,
+    getBasketItemsMap: (state) => state.basket,
 
-    getProductById: (state, productId) => state.basket.get(productId),
-
-    getProductsQuantityByIdInBasket: (state) => {
-      const dict = new Map();
-
-      for (const key of state.basket.keys()) {
-        const productObject = state.basket.get(key);
-
-        dict.set(productObject.id, productObject.quantityInBasket);
+    getBasketItemById: (state) => (productId) => {
+      if (state.basket.has(productId)) {
+        return state.basket.get(productId);
+      } else {
+        return state.default;
       }
-
-      return dict;
     },
   },
   mutations: {
-    setProduct: (state, { productId, productObject }) =>
-      state.basket.set(productId, productObject),
+    addProductInBasket: (state, productId) => {
+      state.basket.set(productId, Object.assign({}, state.default));
+    },
+    removeProductFromBasket: (state, productId) => {
+      state.basket.delete(productId);
+    },
+    incBasketQuantity: (state, productId) => {
+      const basketItem = state.basket.get(productId);
 
-    deleteProduct: (state, productId) => state.basket.delete(productId),
+      basketItem.basketQuantity++;
+
+      state.basket.set(productId, basketItem);
+    },
+    decBasketQuantity: (state, productId) => {
+      const basketItem = state.basket.get(productId);
+
+      basketItem.basketQuantity--;
+
+      state.basket.set(productId, basketItem);
+    },
   },
   actions: {
-    addProductElement: ({ state, commit }, { productId, productObject }) => {
-      if (state.basket.has(productId)) {
-        productObject = state.basket.get(productId);
-        productObject.quantityInBasket++;
-      } else {
-        productObject.quantityInBasket = 1;
+    addProductInBasket: ({ state, commit }, productId) => {
+      if (!state.basket.has(productId)) {
+        commit("addProductInBasket", productId);
       }
-
-      commit("setProduct", { productId, productObject });
+      commit("incBasketQuantity", productId);
     },
 
-    removeProductElement: ({ state, commit }, productId) => {
-      if (state.basket.has(productId)) {
-        const productObject = state.basket.get(productId);
+    removeProductFromBasket: ({ commit, getters }, productId) => {
+      const basketItem = getters["getBasketItemById"](productId);
 
-        if (productObject.quantityInBasket <= 1) {
-          commit("deleteProduct", productId);
-        } else {
-          productObject.quantityInBasket--;
-          commit("setProduct", productId, productObject);
-        }
+      if (basketItem.basketQuantity > 1) {
+        commit("decBasketQuantity", productId);
+      } else {
+        commit("removeProductInBasket", productId);
       }
     },
   },

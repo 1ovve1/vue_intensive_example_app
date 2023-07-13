@@ -26,8 +26,6 @@
 <script>
 export default {
   name: "AppFooter",
-  data: () => ({
-    a: 1,
-  }),
+  components: {},
 };
 </script>
