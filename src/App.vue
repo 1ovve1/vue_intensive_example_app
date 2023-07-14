@@ -1,24 +1,32 @@
 <template>
-  <div class="container mt-5">
-    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Labore dignissimos
-    quisquam sint quod aliquid, cupiditate velit at facere eveniet iure sequi
-    exercitationem enum, aperiam veniam reprehenderit ipsum, ad mollitia
-    excepturi?
-    <el-button type="primary">Push</el-button>
+  <div class="main">
+    <div class="main__content">
+      <header class="main__header header">
+        <AppHeader />
+      </header>
+
+      <div class="content container">
+        <AppProductList />
+      </div>
+    </div>
+
+    <div class="main__footer footer">
+      <AppFooter />
+    </div>
   </div>
 </template>
 
 <script>
-import { ElButton } from "element-plus";
+import AppHeader from "./components/Header.vue";
+import AppProductList from "./components/ProductList.vue";
+import AppFooter from "./components/Footer.vue";
 
 export default {
   components: {
-    ElButton,
+    AppHeader,
+    AppProductList,
+    AppFooter,
   },
-
-  data: () => ({
-    test: 1234,
-  }),
 };
 </script>
 
