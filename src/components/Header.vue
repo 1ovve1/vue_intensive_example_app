@@ -46,7 +46,7 @@
                 <span class="mx-1">{{}}</span>
               </a>
               <span class="m-2 m-lg-0"></span>
-              <a class="nav-link d-flex" href="#">
+              <a class="nav-link d-flex" @click="openCartDialog()">
                 <font-awesome-icon icon="fa-shopping-bag"> </font-awesome-icon>
                 <span class="mx-1">{{ basketProductsQuantity }}</span>
               </a>
@@ -61,17 +61,27 @@
       </div>
     </nav>
   </div>
+  <el-dialog v-model="showCartDialog" title="User Cart">
+    <AppCart />
+  </el-dialog>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import { ElDialog } from "element-plus";
 import AppPrice from "./Price.vue";
+import AppCart from "./Cart.vue";
 
 export default {
   name: "AppHeader",
   components: {
     AppPrice,
+    AppCart,
+    ElDialog,
   },
+  data: () => ({
+    showCartDialog: false,
+  }),
   computed: {
     ...mapGetters({
       productsInBasketMap: "catalog/getProductsInBasketMap",
@@ -96,6 +106,12 @@ export default {
       );
 
       return totalQuantityInBasket;
+    },
+  },
+  methods: {
+    openCartDialog() {
+      console.log(this.showCartDialog);
+      this.showCartDialog = true;
     },
   },
 };

@@ -54,7 +54,7 @@ export default {
     },
 
     removeProductFromBasket: ({ dispatch }, productId) => {
-      dispatch("basket/removeProductElement", productId);
+      dispatch("basket/removeProductFromBasket", productId);
     },
   },
   modules: {

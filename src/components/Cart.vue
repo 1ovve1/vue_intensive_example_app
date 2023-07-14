@@ -1,8 +1,16 @@
 <template>
   <div class="cart">
     <div
-      v-for="product in productsInBasketMap.values()"
-      :key="product.id"
+      v-if="productsInBasketMap.size <= 0"
+      class="text-center text-uppercase bold"
+    >
+      Cart is empty
+    </div>
+
+    <div
+      v-else
+      v-for="[productId, product] in productsInBasketMap"
+      :key="productId"
       class="card w-100 mb-3"
     >
       <div class="row g-0">
@@ -17,34 +25,31 @@
           <div class="card-body">
             <h5 class="card-title">{{ product.name }}</h5>
             <p class="card-text">
-              <AppPrice :value="product.price" />
+              <AppPrice :value="product.price * product.basketQuantity" />
             </p>
             <div>
               <div class="container d-flex justify-content-center">
                 <el-button
                   class="col-2"
                   type="primary"
-                  @click="addProductInBasket(product)"
+                  @click="addProductInBasket(productId)"
+                  :disabled="product.basketQuantity >= product.available"
                 >
                   +
                 </el-button>
-                <div
-                  :key="product.render"
-                  class="col-2 text-center"
-                  type="text"
-                >
+                <div class="col-2 text-center" type="text">
                   {{ product.quantityInBasket }}
                 </div>
                 <el-button
                   class="col-2"
                   type="primary"
-                  @click="removeProductFromBasket(product)"
+                  @click="removeProductFromBasketWithConfirm(productId)"
                 >
                   -
                 </el-button>
               </div>
               <i class="d-block text-center">
-                <!-- Available: {{ calculateLeftovers(product) }} -->
+                Available: {{ product.available - product.basketQuantity }}
               </i>
 
               <el-button class="d-block mx-auto mt-2" type="success">
@@ -55,13 +60,14 @@
         </div>
       </div>
     </div>
+    <div>Total: <AppPrice :value="totalPrice" /></div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import { ElButton, ElMessageBox, ElMessage } from "element-plus";
 import AppPrice from "./Price";
-import { ElButton } from "element-plus";
 
 export default {
   name: "AppCart",
@@ -75,26 +81,52 @@ export default {
     ...mapGetters({
       productsInBasketMap: "catalog/getProductsInBasketMap",
     }),
+
+    totalPrice() {
+      let totalPrice = 0;
+
+      for (const product of this.productsInBasketMap.values()) {
+        totalPrice += product.price * product.basketQuantity;
+      }
+
+      return totalPrice;
+    },
   },
 
   methods: {
     ...mapActions({
-      addProductInBasketStored: "catalog/addProductInBasket",
-      removeProductFromBasketStored: "catalog/removeProductFromBasket",
+      addProductInBasket: "catalog/addProductInBasket",
+      removeProductFromBasket: "catalog/removeProductFromBasket",
     }),
+    removeProductFromBasketWithConfirm(productId) {
+      const product = this.productsInBasketMap.get(productId);
 
-    addProductInBasket(productObject) {
-      const productId = productObject.id;
-
-      this.addProductInBasketStored({
-        productId,
-        productObject,
-      });
+      if (product.basketQuantity <= 1) {
+        this.deleteProductWithConfirm(productId, product.name);
+      } else {
+        this.removeProductFromBasket(productId);
+      }
     },
-    removeProductFromBasket(productObject) {
-      const productId = productObject.id;
 
-      this.removeProductFromBasketStored(productId);
+    async deleteProductWithConfirm(productId, productName) {
+      ElMessageBox.confirm(
+        `Product "${productName}" will be removed from your cart. Continue?`,
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.removeProductFromBasket(productId);
+        })
+        .then(() => {
+          ElMessage({
+            type: "success",
+            message: `Product "${productName}" was removed from the basket`,
+          });
+        });
     },
   },
 };

@@ -53,7 +53,7 @@ export default {
       if (basketItem.basketQuantity > 1) {
         commit("decBasketQuantity", productId);
       } else {
-        commit("removeProductInBasket", productId);
+        commit("removeProductFromBasket", productId);
       }
     },
   },
